@@ -22,7 +22,7 @@ section .data
     ;indica 8 ou 16 
 
     8bits:  db 0 
-
+;eae men 
 
 section .text
     exec:  

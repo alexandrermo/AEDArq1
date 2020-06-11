@@ -15,17 +15,20 @@ extern int8_t NEGATIVO; //TESTE
 extern void executa();
 
 int main(){
-    R1 = 0x00;
-    R2 = 0x00;
+    R1 = 12;
+    R2 = 31;
 
-    H1 = 0x0000;
-    H2 = 0x0000;
+    H1 = 0x0009;
+    H2 = 0x0001;
 
-    mem[0] = 0x04;
-    mem[1] = 0x05;
-    mem[2] = 0x06;
-    mem[3] = 0x27;
-    
+    mem[0] = 0x06;
+    mem[1] = 0x07;
+    mem[2] = 0x00;
+    mem[3] = 0x00;
+    mem[4] = 0x00;
+    mem[5] = 0x01;
+    mem[6] = 0x27;
+    mem[7] = 0x07;
     executa();
 
     if  (existeErro){ //Verifica se existe erro

@@ -48,7 +48,7 @@ desvios: dq $ADD_OP, $SUB_OP, $AND_OP,$XOR_OP, $OR_OP ;,$NOT,$CMP_OP
         ;  dq $SHL_OP,$SHR_OP
         ;  dq $PUSH_OP,$POP_OP
         ;  dq  $JMP_OP,$JZ_OP,$JNZ_OP,$JL_OP,$JLE_OP,$JG_OP,$JGE_OP,$JC_OP
-        ;  dq  $LOOP_OP,$CALL_OP,$RET_OP,$NOP_OP,$HALT_OP
+        dq  $LOOP_OP,$CALL_OP,$RET_OP;,$NOP_OP,$HALT_OP
         ;  dq  $LOAD_OP,$STORE_OP,$STORE_REG_OP
         ;  dq  $IN_OP,$OUT_OP,$INTR_OP
         ;  dq  $ADDZAO_OP,$SUBZAO_OP 
@@ -231,12 +231,34 @@ OR_OP:
 		add si,3
 		mov word[xIP],si
 		jmp eterno
-
-
-
-
-
-
+LOOP_OP: ; sempre faz
+   xor rax,rax
+   mov ax, word[H1]
+   sub ax,1
+   cmp ax,0
+   jle FIM_LOOP_OP 
+   mov word[H1], ax
+   mov rdx, rsi
+   mov si, word[rdi+rdx+1]
+   mov word[xIP], si
+   jmp eterno
+FIM_LOOP_OP:
+	mov word[H1],ax
+	add si,3
+	mov word[xIP],si
+	jmp eterno
+CALL_OP:
+	mov rdx,rsi
+	add rdx,3
+	push rdx
+	mov rdx,rsi
+	mov si, word[rdi+rdx+1]
+	mov word[xIP],si
+	jmp eterno
+RET_OP:
+	pop rsi
+	mov word[xIP],si
+	jmp eterno
 
 ; CASO PRECISE SAIR DA EXECUÇÃO
 RETORNO:

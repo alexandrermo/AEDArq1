@@ -6,6 +6,7 @@ extern int8_t R1; //TESTE
 extern int8_t R2; //TESTE
 extern int16_t H1; //TESTE
 extern int16_t H2; //TESTE
+extern int16_t xSP; //TESTE
 extern int8_t existeErro;
 extern char* ptErro;
 extern int16_t posMemErro;
@@ -15,6 +16,7 @@ extern int8_t NEGATIVO; //TESTE
 extern void executa();
 
 int main(){
+<<<<<<< Updated upstream
     R1 = 12;
     R2 = 31;
 
@@ -29,6 +31,23 @@ int main(){
     mem[5] = 0x01;
     mem[6] = 0x27;
     mem[7] = 0x07;
+=======
+    R1 = 1;
+    R2 = 2;
+
+    H1 = 0;
+    H2 = 0xFFFE;
+
+    mem[0] = 0x00;
+    mem[1] = 0x05;
+    mem[2] = 0x06;
+    mem[3] = 0x26;
+    mem[4] = 0x01;
+    mem[5] = 0x0A;
+    mem[6] = 0x05;
+    mem[7] = 0x26;
+    
+>>>>>>> Stashed changes
     executa();
 
     if  (existeErro){ //Verifica se existe erro
@@ -41,10 +60,11 @@ int main(){
                 printf("%c", ptErro[i]); //Printa a string do erro
                 i++;
             }
-            if  (ptErro[i+1] == 0) printf("\n");
+            if  (ptErro[i] == 0) printf("\n");
         }
         
     }
-    printf("R1: %d, H1: %d, CARRY: %d, ZERO: %d, NEGATIVO: %d\n", R1, H1, CARRY, ZERO, NEGATIVO);
+    if  (!existeErro) printf("R1: %d, R2: %d, SP: %d, H1: %d CARRY: %d, ZERO: %d, NEGATIVO: %d\n", 
+                                R1, R2, xSP, H1, CARRY, ZERO, NEGATIVO);
     return 0;
 }

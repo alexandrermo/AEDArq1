@@ -16,7 +16,7 @@ extern int8_t NEGATIVO; //TESTE
 extern void executa();
 
 int main(){
-<<<<<<< Updated upstream
+
     R1 = 12;
     R2 = 31;
 
@@ -31,7 +31,7 @@ int main(){
     mem[5] = 0x01;
     mem[6] = 0x27;
     mem[7] = 0x07;
-=======
+
     R1 = 1;
     R2 = 2;
 
@@ -47,7 +47,7 @@ int main(){
     mem[6] = 0x05;
     mem[7] = 0x26;
     
->>>>>>> Stashed changes
+
     executa();
 
     if  (existeErro){ //Verifica se existe erro

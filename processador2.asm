@@ -1,6 +1,6 @@
 global mem
 global executa 
-
+;xandin
 global R1 ; MUDARAQUI
 global R2 ;MUDARAQUI
 
@@ -49,10 +49,10 @@ CARRY  equ  $regs+15
 x8bits:  db 0
 desvios: dq $ADD_OP, $SUB_OP, $AND_OP,$XOR_OP, $OR_OP, $NOT_OP
 		 dq $CMP_OP, $SHL_OP, $SHR_OP, $PUSH_OP,$POP_OP
-        ;  dq  $JMP_OP,$JZ_OP,$JNZ_OP,$JL_OP,$JLE_OP,$JG_OP,$JGE_OP,$JC_OP
-         dq $LOOP_OP,$CALL_OP,$RET_OP;,$NOP_OP,$HALT_OP
+        dq  $JMP_OP,$JZ_OP,$JNZ_OP,$JL_OP,$JLE_OP,$JG_OP,$JGE_OP,$JC_OP
+         dq $LOOP_OP,$CALL_OP,$RET_OP,$NOP_OP,$HALT_OP
 		 dq $ADDZAO_OP, $SUBZAO_OP
-        ;  dq  $LOAD_OP,$STORE_OP,$STORE_REG_OP
+        dq  $LOAD_OP,$STORE_OP,$STORE_REG_OP
         ;  dq  $IN_OP,$OUT_OP,$INTR_OP
 
 segment .text
@@ -473,7 +473,61 @@ POP_OP:
 		add si,2
 		mov word[xIP],si
 		jmp eterno
-
+JMP_OP:
+	xor rax,rax
+	mov ax,word [rsi+rdi+1]
+   mov rsi,rax
+   jmp eterno
+;INSTRUÇÃO DE DESVIO JZ_OP
+JZ_OP:
+    mov al,byte [ZERO]
+    cmp al,1
+    je JMP_OP
+ nao_desvia:
+    add rsi, 3
+    jmp eterno
+;INSTRUÇÃO DE DESVIO JNZ_OP
+JNZ_OP:
+    mov al,byte [ZERO]
+    cmp al,0
+    je JMP_OP
+    jmp nao_desvia
+;INSTRUÇÃO DE DESVIO JL_OP	
+JL_OP:    
+    mov al,byte [NEGATIVO]
+    cmp al,1
+    je JMP_OP
+	jmp nao_desvia
+;INSTRUÇÃO DE DESVIO JLE_OP
+JLE_OP:
+	mov al, byte [NEGATIVO]
+	cmp al,1
+	je JMP_OP
+	mov al, byte [ZERO]
+	cmp al,1
+	je JMP_OP
+	jmp nao_desvia
+;INSTRUÇÃO DE DESVIO JG_OP
+JG_OP:
+	mov al, byte[NEGATIVO]
+	cmp al,0
+	je JMP_OP
+	mov al,byte [ZERO]
+	cmp al,0
+	je JMP_OP
+	jmp nao_desvia
+;INSTRUÇÃO DE DESVIO JGE_OP
+JGE_OP:
+	mov al,byte [NEGATIVO]
+    cmp al,0
+    je JMP_OP
+	jmp nao_desvia
+;INSTRUÇÃO DE DESVIO JC_OP
+JC_OP:
+	mov al, byte[CARRY]
+	cmp al,1
+	je JMP_OP
+	jmp nao_desvia
 LOOP_OP: ; sempre faz
    xor rax,rax
    mov ax, word[H1]
@@ -502,8 +556,140 @@ RET_OP:
 	pop rsi
 	mov word[xIP],si
 	jmp eterno
+HALT_OP:
+	jmp RETORNO
+;INSTRUÇÃO ESPECIAL NOP
+NOP_OP:
+	add rsi,1
+	jmp eterno
+LOAD_OP:
+	call DECO_1REG_AND_TESTA
+	cmp r8,1
+	je INVAL_INSTRUCTION_PARAM
+	mov bl, byte[rdi+rsi+2]
+	cmp bl,0
+	je LOAD0
+	cmp bl,1
+	je LOAD1
+	cmp bl,2
+	je LOAD2
+	cmp bl,3
+	je LOAD3
 
+LOAD0:
+	cmp rcx,0
+	je LOAD0_8BITS
+	mov rbx,0
+	mov bl, byte[rdi+rsi+3]
+	shl rbx, 8
+	mov r9,0
+	mov r9b, byte[rdi+rsi+4]
+	add rbx, r9
+	mov word[rax],bx
+	add rsi,5
+	mov word[xIP], si
+	jmp eterno
 
+LOAD0_8BITS:
+	mov bl, byte[rdi+rsi+3]
+	mov byte[rax],bl
+	add rsi,4
+	mov word[xIP], si
+	jmp eterno
+LOAD1:
+	add rsi,2
+	mov rbx,rax
+	mov r9,rcx
+	call DECO_1REG_AND_TESTA
+	cmp r8,1
+	je INVAL_INSTRUCTION_PARAM 
+	cmp r9,rcx ; Verificando se são do mesmo tipo, se não chamo o erro
+	jne INVAL_INSTRUCTION_PARAM  
+	cmp rcx,0 ; verificando se e 8bits, se não continuo o codigo	
+	je LOAD1_8BITS
+	mov r9w, word[rax]
+	mov word[rdx],r9w
+	add rsi,2
+	mov word[xIP], si
+	jmp eterno
+LOAD1_8BITS:
+	mov r9b, byte[rax]
+	mov byte[rbx], r9b
+	add rsi,2
+	mov word[xIP], si
+	jmp eterno
+	
+LOAD2:
+	cmp rcx,1 ; verificando se o registrador é de 16 bits, se sim chamo o erro
+	je INVAL_INSTRUCTION_PARAM
+	mov rbx,0
+	mov bl, byte[rdi+rsi+3]
+	shl rbx, 8
+	mov r9,0
+	mov r9b, byte[rdi+rsi+4]
+	add rbx, r9
+	mov dl, byte[rdi+rbx]
+	mov byte[rax],dl
+	add rsi,5
+	mov word[xIP], si
+	jmp eterno
+
+LOAD3:
+	cmp rcx,1 ; verificando se o registrador é de 16 bits, se sim chamo o erro
+	je INVAL_INSTRUCTION_PARAM
+	add rsi,2
+	mov rbx,rax
+	mov r9,rcx
+	call DECO_1REG_AND_TESTA
+	cmp r8,1
+	je INVAL_INSTRUCTION_PARAM 
+	cmp rcx,0 ; verificando se o registrador é de 8 bits, se sim chamo o erro
+	je INVAL_INSTRUCTION_PARAM 
+	mov r9,0
+	mov r9w, word[rax]
+	mov al, byte[rdi+r9]
+	mov byte[rbx], al
+	add rsi, 2
+	mov word[xIP], si
+	jmp eterno
+STORE_OP:
+	add rsi,2
+	call DECO_1REG_AND_TESTA
+	cmp r8,1
+	je INVAL_INSTRUCTION_PARAM
+	cmp rcx,1
+	je INVAL_INSTRUCTION_PARAM 
+	mov rbx,0
+	mov bl, byte[rdi+rsi-2]
+	shl rbx, 8
+	mov r9,0
+	mov r9b, byte[rdi+rsi-1]
+	add rbx, r9
+	mov r9b,byte[rax]
+	mov byte[rdi+rbx], r9b
+	add rsi,2
+	mov word[xIP], si
+	jmp eterno
+STORE_REG_OP:
+	call DECO_1REG_AND_TESTA
+	cmp r8,1
+	je INVAL_INSTRUCTION_PARAM
+	cmp rcx, 0
+	je INVAL_INSTRUCTION_PARAM
+	mov rbx, rax
+	add rsi,1
+	call DECO_1REG_AND_TESTA
+	cmp r8,1
+	je INVAL_INSTRUCTION_PARAM
+	cmp rcx, 1
+	je INVAL_INSTRUCTION_PARAM
+	mov r9b, byte[rax]
+	mov rcx,0
+	mov cx, word[rbx]
+	mov byte[rdi+rcx],r9b
+	add rsi,2
+	mov word[xIP], si
+	jmp eterno
 ;Operação Aritmética ADDZAO
 ADDZAO_OP:
 	call DECO_2REGS_AND_TESTA

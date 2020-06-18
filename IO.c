@@ -16,38 +16,22 @@ extern int8_t NEGATIVO; //TESTE
 extern void executa();
 
 int main(){
-
     R1 = 12;
     R2 = 31;
 
-    H1 = 0x0009;
-    H2 = 0x0001;
-
-    mem[0] = 0x06;
-    mem[1] = 0x07;
-    mem[2] = 0x00;
-    mem[3] = 0x00;
-    mem[4] = 0x00;
-    mem[5] = 0x01;
-    mem[6] = 0x27;
-    mem[7] = 0x07;
-
-    R1 = 1;
-    R2 = 2;
-
-    H1 = 0;
-    H2 = 0xFFFE;
+    H1 = 1;
+    H2 = 20;
 
     mem[0] = 0x00;
-    mem[1] = 0x05;
-    mem[2] = 0x06;
-    mem[3] = 0x26;
-    mem[4] = 0x01;
-    mem[5] = 0x0A;
-    mem[6] = 0x05;
-    mem[7] = 0x26;
-    
-
+    mem[1] = 0x01;
+    mem[2] = 0x00;
+    mem[3] = 0x06;
+    mem[4] = 0x05;
+    mem[5] = 0x10;
+    mem[6] = 0x01;
+    mem[7] = 0x27;
+    mem[20] = 5;
+    mem[21] = 0;
     executa();
 
     if  (existeErro){ //Verifica se existe erro
@@ -64,7 +48,7 @@ int main(){
         }
         
     }
-    if  (!existeErro) printf("R1: %d, R2: %d, SP: %d, H1: %d CARRY: %d, ZERO: %d, NEGATIVO: %d\n", 
-                                R1, R2, xSP, H1, CARRY, ZERO, NEGATIVO);
+    if  (!existeErro) printf("R1: %d, R2: %d, mem[21]: %d SP: %d, H1: %d CARRY: %d, ZERO: %d, NEGATIVO: %d\n", 
+                                R1, R2, mem[21], xSP, H1, CARRY, ZERO, NEGATIVO);
     return 0;
 }
